@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OpenSciEd Biology B.4 Teacher Dashboard</title>
+  <style>
+    :root {
+      --bg: #f3f6f1;
+      --panel: #ffffff;
+      --ink: #1f2a24;
+      --muted: #64706a;
+      /* Unit B.4 urban ecology / natural selection palette */
+      --teal: #6f8f72;
+      --teal-dark: #36563a;
+      --green: #8bbf45;
+      --orange: #c4823b;
+      --blue: #3f6f8f;
+      --red: #a84a3f;
+      --line: #dce6d8;
+      --shadow: 0 10px 28px rgba(31,42,36,.10);
+      --radius: 18px;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: var(--bg); color: var(--ink); line-height: 1.45; }
+    header { background: linear-gradient(135deg, #36563a, #6f8f72 55%, #1f2933); color: white; padding: 34px 24px 26px; }
+    .wrap { max-width: 1240px; margin: 0 auto; }
+    .eyebrow { text-transform: uppercase; letter-spacing: .12em; font-size: 12px; font-weight: 700; opacity: .92; }
+    h1 { margin: 8px 0 8px; font-size: clamp(28px, 4vw, 48px); line-height: 1.05; }
+    .subtitle { max-width: 850px; font-size: 18px; opacity: .96; }
+    .top-actions { margin-top: 22px; display: flex; flex-wrap: wrap; gap: 10px; }
+    .btn { border: 1px solid rgba(255,255,255,.65); border-radius: 999px; padding: 10px 14px; background: rgba(255,255,255,.16); color: white; text-decoration: none; font-weight: 700; font-size: 14px; cursor: pointer; }
+    main { padding: 24px; }
+    .grid { display: grid; gap: 18px; }
+    .stats { grid-template-columns: repeat(4, minmax(0,1fr)); margin-top: 22px; }
+    .stat, .card, .toolbar, .detail { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
+    .stat { padding: 18px; }
+    .stat b { display:block; font-size: 32px; color: var(--teal-dark); }
+    .stat span { color: var(--muted); font-size: 14px; }
+    .toolbar { margin: 22px 0; padding: 16px; display: grid; gap: 12px; grid-template-columns: 1.4fr repeat(3, .7fr); align-items: center; }
+    input, select { width: 100%; border: 1px solid var(--line); border-radius: 12px; padding: 12px 13px; font: inherit; background: white; color: var(--ink); }
+    .layout { display: grid; grid-template-columns: 390px 1fr; gap: 20px; align-items: start; }
+    .lesson-list { display: grid; gap: 12px; }
+    .card { padding: 16px; cursor: pointer; transition: .18s ease; text-align:left; }
+    .card:hover, .card.active { transform: translateY(-2px); border-color: var(--teal); box-shadow: 0 14px 32px rgba(31,42,36,.14); }
+    .lesson-num { color: var(--teal-dark); font-weight: 900; font-size: 13px; text-transform: uppercase; letter-spacing: .08em; }
+    .card h3 { margin: 6px 0 8px; font-size: 18px; }
+    .meta { display: flex; flex-wrap: wrap; gap: 7px; margin: 10px 0 0; }
+    .pill { display: inline-flex; align-items: center; gap: 4px; border-radius: 999px; padding: 5px 9px; font-size: 12px; font-weight: 700; background: #edf4ea; color: var(--teal-dark); }
+    .pill.green { background:#eef7e5; color:#4d7c24; }
+    .pill.orange { background:#fff2e3; color:#93500e; }
+    .detail { padding: 0; overflow: hidden; position: sticky; top: 16px; }
+    .detail-head { padding: 22px; background: #edf4ea; border-bottom: 1px solid var(--line); }
+    .detail-head h2 { margin: 6px 0 8px; font-size: 28px; }
+    .detail-body { padding: 22px; display: grid; gap: 18px; }
+    .section { border: 1px solid var(--line); border-radius: 14px; padding: 16px; background: #fff; }
+    .section h4 { margin: 0 0 10px; color: var(--teal-dark); font-size: 15px; text-transform: uppercase; letter-spacing: .08em; }
+    details.section summary { cursor: pointer; list-style: none; }
+    details.section summary::-webkit-details-marker { display:none; }
+    details.section summary h4::after { content: " +"; float:right; color:var(--muted); }
+    details.section[open] summary h4::after { content: " –"; }
+    ul { margin: 8px 0 0; padding-left: 20px; }
+    li { margin: 5px 0; }
+    .twocol { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .links a { display:block; color: var(--blue); font-weight: 700; text-decoration: none; margin: 8px 0; }
+    .links a:hover { text-decoration: underline; }
+    .timeline { display:grid; gap: 10px; }
+    .step { padding: 10px 12px; border-left: 4px solid var(--teal); background: #f8fbf6; border-radius: 10px; }
+    .step b { color: var(--teal-dark); }
+    .notice { background:#fff8eb; border:1px solid #f4d6a8; color:#5d4218; padding: 12px 14px; border-radius: 14px; }
+    .resource-buttons { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 8px; }
+    .resource-btn { display:flex; align-items:center; justify-content:center; text-align:center; min-height:44px; border-radius: 12px; background: var(--teal-dark); color: white; text-decoration:none; font-weight:800; padding: 10px; }
+    .sticky-resource { position: sticky; top: 0; z-index: 5; border-radius: 14px; box-shadow: 0 8px 18px rgba(31,42,36,.10); }
+    .checklist { display:grid; gap:8px; }
+    .checklist label { display:flex; gap:9px; align-items:flex-start; padding:8px 10px; border:1px solid var(--line); border-radius:10px; background:#f8fbf6; }
+    .checklist input { width:auto; margin-top:3px; }
+    .timer-row { display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+    .timer-btn { border:0; border-radius:999px; padding:10px 14px; background:var(--teal-dark); color:white; font-weight:800; cursor:pointer; }
+    .timer-btn.secondary { background:var(--muted); }
+    .timer-display { font-size:30px; font-weight:900; color:var(--teal-dark); min-width:110px; }
+    .talk-move { font-size:18px; font-weight:800; color:var(--teal-dark); padding:12px; background:#f8fbf6; border-radius:12px; border:1px solid var(--line); }
+    .footer-note { color: var(--muted); font-size: 13px; margin: 28px 0 8px; }
+    @media (max-width: 980px) { .toolbar, .layout, .twocol { grid-template-columns: 1fr; } .stats { grid-template-columns: repeat(2, minmax(0,1fr)); } .detail { position: static; } }
+    @media (max-width: 560px) { header { padding: 26px 16px 22px; } main { padding: 16px; } .stats { grid-template-columns: 1fr; margin-top: 16px; } .stat b { font-size: 28px; } }
+    @media print { header, .toolbar, .lesson-list { display:none; } main { padding:0; } .layout, .twocol { display:block; } .detail { box-shadow:none; border:none; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <div class="eyebrow">OpenSciEd High School Biology • Unit B.4</div>
+      <h1>Natural Selection & Evolution of Populations: Urbanization</h1>
+      <div class="subtitle">Interactive lesson-by-lesson teacher lookup dashboard for urbanization, nonhuman populations, natural selection, genetic diversity, and biodiversity-supporting city design.</div>
+      <div class="top-actions">
+        <a class="btn" href="https://www.openscied.org/" target="_blank" rel="noopener">OpenSciEd.org</a>
+        <a class="btn" href="https://drive.google.com/drive/folders/12Hn5sVMzn_x9yuxc3AGFIiFcPy-69MG-" target="_blank" rel="noopener">Official Unit Drive</a>
+        <button class="btn" onclick="window.print()">Print selected lesson</button>
+        <button class="btn" onclick="resetFilters()">Reset filters</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="grid stats" aria-label="Unit stats">
+      <div class="stat"><b>11</b><span>Lessons</span></div>
+      <div class="stat"><b>23</b><span>Total class days</span></div>
+      <div class="stat"><b>2</b><span>Lesson sets</span></div>
+      <div class="stat"><b>6</b><span>NGSS PEs supported</span></div>
+    </section>
+
+    <section class="toolbar" aria-label="Filters">
+      <input id="search" placeholder="Search lessons, standards, materials, concepts…" oninput="renderLessons()" />
+      <select id="setFilter" onchange="renderLessons()">
+        <option value="all">All lesson sets</option>
+        <option value="Lesson Set 1">Lesson Set 1: Urbanization as change</option>
+        <option value="Lesson Set 2">Lesson Set 2: Designing resilient cities</option>
+      </select>
+      <select id="typeFilter" onchange="renderLessons()">
+        <option value="all">All lesson types</option>
+        <option value="Anchoring Phenomenon">Anchoring Phenomenon</option>
+        <option value="Investigation">Investigation</option>
+        <option value="Problematizing">Problematizing</option>
+        <option value="Putting Pieces Together">Putting Pieces Together</option>
+      </select>
+      <select id="standardFilter" onchange="renderLessons()">
+        <option value="all">All NGSS</option>
+        <option value="HS-LS4-2">HS-LS4-2</option>
+        <option value="HS-LS4-3">HS-LS4-3</option>
+        <option value="HS-LS4-4">HS-LS4-4</option>
+        <option value="HS-LS4-5">HS-LS4-5</option>
+        <option value="HS-LS4-6">HS-LS4-6</option>
+        <option value="HS-ETS1-3">HS-ETS1-3</option>
+      </select>
+    </section>
+
+    <section class="layout">
+      <aside><div id="lessonList" class="lesson-list"></div></aside>
+      <article id="detail" class="detail" aria-live="polite"></article>
+    </section>
+
+    <p class="footer-note">Teacher note: This dashboard summarizes the uploaded OpenSciEd B.4 Teacher Edition for local planning and quick lookup. Always use the official OpenSciEd slides, student handouts, teacher references, and keys when teaching.</p>
+  </main>
+
+<script>
+const DRIVE_FOLDER = "https://drive.google.com/drive/folders/12Hn5sVMzn_x9yuxc3AGFIiFcPy-69MG-";
+const unitLinks = [
+  ["Official OpenSciEd B.4 Unit Drive", DRIVE_FOLDER],
+  ["OpenSciEd main site", "https://www.openscied.org/"],
+  ["Safety acknowledgment form", "https://static.nsta.org/pdfs/SafetyAcknowledgmentForm-HighSchool.pdf"]
+];
+
+const lessons = [
+  {n:1,set:"Lesson Set 1",days:3,type:"Anchoring Phenomenon",pages:"Teacher Edition pp. 25–48",standards:["HS-LS4-2","HS-LS4-5"],question:"What is the effect of increasing urbanization on nonhuman populations?",phenomenon:"Students see evidence of increasing urbanization and examples of populations impacted by those environments.",do:"Students examine increasing urbanization, identify local examples of nonhuman populations affected by cities, read about hawksbeard, juncos, and rats, and develop an initial consensus model.",figure:["Urbanization is expanding globally and affects survival of some nonhuman populations.","Urban hawksbeard populations have more nonfeathery seeds than nonurban populations.","Some urban rat populations resist poison.","Some junco populations moved to cities and are bolder than nonurban juncos.","Students have questions about causes of differences between urban and nonurban populations."],materials:["urbanization images/data","local observation materials or virtual walk","hawksbeard/junco/rat readings","initial model materials","DQB materials","science notebooks"],flow:["Launch increasing urbanization phenomenon.","Identify local examples of urbanization affecting nonhuman populations.","Read the three anchor case studies.","Develop initial model and Driving Question Board."],equity:["Connect to students’ local communities and lived experiences with urban spaces.","Use local or virtual observations to support access."],links:unitLinks},
+  {n:2,set:"Lesson Set 1",days:2,type:"Investigation",pages:"Teacher Edition pp. 49–66",standards:["HS-LS4-2","HS-LS4-3","HS-LS4-4"],question:"Why does hawksbeard make fewer feathery seeds in cities?",phenomenon:"Fragmentation of urban areas impacts seed dispersal strategies in plant populations.",do:"Students conduct an investigation on fragmentation and seed dispersal in hawksbeard, compare results with published studies, discuss common garden experiments, and start a Progress Tracker.",figure:["Urban barriers and habitat fragmentation prevent some seeds from reaching places to grow.","Hawksbeard plants produce more offspring than can survive.","Seed dispersal mode is heritable.","Fragmentation selects for heritable variations that allow more nonfeathery seeds to germinate and reproduce."],materials:["hawksbeard seed dispersal investigation materials","urban/nonurban model setup","published study data","Progress Tracker","science notebooks"],flow:["Model urban fragmentation and seed dispersal.","Collect and compare class data.","Analyze published hawksbeard data.","Update model with selection pressure and heritable variation."],equity:["Clarify common garden experiment purpose.","Use physical models and graphs to support reasoning about selection."],links:unitLinks},
+  {n:3,set:"Lesson Set 1",days:3,type:"Investigation",pages:"Teacher Edition pp. 67–82",standards:["HS-LS4-2","HS-LS4-3","HS-LS4-4"],question:"Is poison a selection pressure?",phenomenon:"80% of rats in Tokyo, Japan are resistant to poison.",do:"Students investigate how rats became poison resistant, discuss ethical decision-making with living things, use a model, gather evidence from genetic variation studies, and revise explanations.",figure:["Poison-resistance mutations existed before people used poison.","Rat populations vary in their mutations.","Variable mutation expression affects physiology and resistance levels.","Rats reproduce sexually, mixing genes.","High reproduction rates allow resistant survivors to increase quickly.","Natural selection for resistance happens over generations."],materials:["rat poison resistance model","case study readings","genetic variation data","preliminary explanation template","self-assessment tools"],flow:["Introduce Tokyo rat resistance phenomenon.","Discuss ethics of living-things investigations.","Use model to explain resistance.","Revise explanation using new data about genetic variation and survival."],equity:["Support ethical reasoning and respectful discussion about pest species.","Separate individual need from population-level change."],links:unitLinks},
+  {n:4,set:"Lesson Set 1",days:3,type:"Investigation",pages:"Teacher Edition pp. 83–100",standards:["HS-LS4-2","HS-LS4-3","HS-LS4-4"],question:"What causes populations of city juncos to be bolder than mountain juncos?",phenomenon:"Juncos in an urban environment are bolder than juncos in the nonurban mountains.",do:"Students investigate whether bold behavior is advantageous in urban UCSD juncos, model inheritance of boldness, examine CORT relationships, and complete an electronic exit ticket.",figure:["Boldness can be advantageous for food and nesting spaces in cities.","Juncos inherit behavioral traits from parents.","Elevated CORT levels correspond to stress and affect exploratory behavior.","Over time, bolder juncos survive and reproduce, increasing boldness in city populations."],materials:["junco case study materials","Google Earth or location comparison resources","CORT/boldness data","modeling materials","electronic exit ticket"],flow:["Compare city and mountain junco behavior.","Analyze evidence for boldness as advantageous.","Investigate CORT and inherited behavioral traits.","Model how boldness changes over generations."],equity:["Use explicit supports for interpreting behavioral data.","Avoid anthropomorphizing while valuing students’ observations."],links:unitLinks},
+  {n:5,set:"Lesson Set 1",days:2,type:"Putting Pieces Together",pages:"Teacher Edition pp. 101–114",standards:["HS-LS4-2","HS-LS4-3","HS-LS4-4","HS-LS4-5"],question:"How can we make sense of the way urbanization could have caused changes in hawksbeard, rat, and junco populations?",phenomenon:"Urbanization can affect the distribution of traits in multiple species.",do:"Students synthesize case studies into group and class consensus models, read about Lamarck and Darwin, and connect their model to evolution by natural selection.",figure:["All populations have heritable variation.","Urban areas have selection pressures.","Individuals with better-adapted variations survive and reproduce more.","Offspring inherit favorable traits.","Over generations, favorable traits increase and less favorable traits decrease.","The consensus model aligns with Darwin’s theory of evolution by natural selection."],materials:["case study evidence cards","group model materials","Darwin/Lamarck reading","class consensus model materials","Progress Tracker"],flow:["Synthesize hawksbeard, rat, and junco evidence.","Build group models and class consensus model.","Compare explanations to Lamarck and Darwin.","Name and refine the natural selection model."],equity:["Use comparison charts to support theory evaluation.","Emphasize population-level change over generations."],links:unitLinks},
+  {n:6,set:"Lesson Set 1",days:1,type:"Putting Pieces Together",pages:"Teacher Edition pp. 115–120",standards:["HS-LS4-2","HS-LS4-3","HS-LS4-4"],question:"Can we apply what we know about evolution by natural selection to another phenomenon?",phenomenon:"Bacteria populations develop resistance to antibiotics.",do:"Students complete a transfer task applying natural selection ideas to antibiotic-resistant bacteria.",figure:["Some bacteria have traits that prevent antibiotics from killing them.","Antibiotic use is positively related to antibiotic resistance.","Natural selection increases the proportion of resistant bacteria.","Reducing antibiotic use can slow the rate of resistance development."],materials:["antibiotic resistance transfer task","Progress Tracker","science notebooks"],flow:["Review natural selection model.","Apply model to bacteria and antibiotics.","Explain how resistance changes in a population.","Navigate to whether all city populations are helped by natural selection."],equity:["Allow reference to consensus model during transfer.","Reinforce that bacteria populations change, not individual bacteria deciding to adapt."],links:unitLinks},
+  {n:7,set:"Lesson Set 2",days:2,type:"Problematizing",pages:"Teacher Edition pp. 121–132",standards:["HS-LS4-5","HS-LS4-6","HS-ETS1-3"],question:"What happens when nonhuman populations are harmed by urbanization and what can we do about it?",phenomenon:"Species can be negatively affected by urbanization. New development can plan to reduce negative effects.",do:"Students explore Florida panthers and Buckeye, AZ mountain lions, recognize limits of their natural selection model, and generate questions about genetic diversity, fitness, and city planning.",figure:["Some populations have reduced fitness in urban environments.","The natural selection model cannot fully explain why this happens.","Growing cities can plan systems that prevent harm to nonhuman populations."],materials:["Florida panther case materials","Buckeye, AZ development context","DQB materials","consensus model","science notebooks"],flow:["Introduce harmed populations case.","Apply and critique the natural selection model.","Introduce Buckeye, AZ as design context.","Generate questions about fragmentation, diversity, and city planning."],equity:["Frame urban design as balancing human and nonhuman needs.","Use community-centered decision-making norms."],links:unitLinks},
+  {n:8,set:"Lesson Set 2",days:2,type:"Investigation",pages:"Teacher Edition pp. 133–144",standards:["HS-LS4-3","HS-LS4-5"],question:"How can fragmentation lead to lower genetic diversity?",phenomenon:"Students manipulate a model that simulates the effect of fragmentation on genetic diversity of an urban population.",do:"Students use a mathematical model to explain how fragmentation lowers genetic diversity, apply a selection pressure, graph allele frequencies over time, and compare group results.",figure:["Fragmentation can create smaller, isolated populations.","Fragmented populations become less fit if they lose advantageous alleles.","Selection pressures and random chance can cause loss of allelic diversity.","Populations that lose genetic diversity cannot always adapt to changing environments."],materials:["fragmentation model materials","allele frequency manipulatives or simulation","graphing tools","model instructions","science notebooks"],flow:["Run population fragmentation model.","Apply selection pressure.","Graph allele frequency changes.","Compare group results and build explanation."],equity:["Allow digital graphing tools when helpful.","Make allele frequency and genetic diversity vocabulary visible."],links:unitLinks},
+  {n:9,set:"Lesson Set 2",days:2,type:"Investigation",pages:"Teacher Edition pp. 145–162",standards:["HS-LS4-6","HS-ETS1-3","HS-LS4-5"],question:"How can we plan urban areas to protect genetic diversity in nonhuman populations?",phenomenon:"Wildlife corridors affect population stability and genetic diversity in nonhuman populations.",do:"Students investigate whether connecting habitats improves stability and resilience, examine human-made corridor structures, analyze effectiveness data, and develop criteria for Buckeye.",figure:["Selection pressures shift trait distributions.","Reducing fragmentation maintains genetic diversity so populations can adapt.","People can create corridors to connect fragmented populations.","Criteria can guide urbanization that sustains biodiversity and benefits humans and nonhuman populations."],materials:["wildlife corridor examples","effectiveness data","statistical reasoning tools","criteria organizer","Buckeye planning materials"],flow:["Investigate habitat connection strategies.","Analyze corridor effectiveness data.","Develop criteria for urban planning.","Apply criteria to Buckeye context."],equity:["Discuss who benefits and who bears burdens of urban design decisions.","Use maps/images to support spatial reasoning."],links:unitLinks},
+  {n:10,set:"Lesson Set 2",days:2,type:"Putting Pieces Together",pages:"Teacher Edition pp. 163–172",standards:["HS-LS4-5","HS-LS4-6","HS-ETS1-3"],question:"How can we use what we know about natural selection to design cities that support resilient populations and ecosystems?",phenomenon:"Evaluate designs proposed for the anticipated growth of the city of Buckeye, AZ.",do:"Students investigate competing requirements in Buckeye, read about wildlife needs, compare their criteria with community criteria/constraints, evaluate two proposed designs, and consider local application.",figure:["Natural selection knowledge helps evaluate stability of proposed urban systems.","Urban areas can be designed to prevent fragmentation and allow gene flow.","Decision-making involves applying science ideas and balancing societal impacts.","Land use decisions are complex and may require prioritizing criteria."],materials:["Buckeye development designs","mountain lion/mule deer/wildlife needs readings","criteria and constraints organizer","design evaluation tool","science notebooks"],flow:["Review Buckeye planning context.","Compare wildlife requirements and human needs.","Evaluate two urbanization designs.","Apply learning to local areas of concern."],equity:["Center both human and nonhuman needs in design evaluation.","Make trade-offs explicit rather than treating design as one right answer."],links:unitLinks},
+  {n:11,set:"Lesson Set 2",days:1,type:"Putting Pieces Together",pages:"Teacher Edition pp. 173–178",standards:["HS-LS4-2","HS-LS4-3","HS-LS4-4","HS-LS4-5"],question:"Can we apply what we know about natural selection and genetic diversity to a novel phenomenon?",phenomenon:"Banana populations are devastated by fungal infections.",do:"Students complete a transfer task applying natural selection and genetic diversity ideas to protecting banana crops from fungal infections.",figure:["Fungal infections show patterns in banana populations.","Most banana crops are grown clonally and have little genetic diversity.","Scientists can create genetically modified bananas resistant to one fungus.","Growing only one genetic variety keeps banana crops vulnerable to infection."],materials:["banana fungal infection transfer task","Progress Tracker","science notebooks"],flow:["Review natural selection and genetic diversity models.","Apply ideas to bananas and fungal infection.","Explain vulnerability of clonal crops.","Consider solutions and limitations."],equity:["Support transfer with model references.","Clarify genetic diversity as population-level resilience."],links:unitLinks}
+];
+
+let selected = lessons[0].n;
+function matches(l) {
+  const q = document.getElementById('search').value.toLowerCase().trim();
+  const set = document.getElementById('setFilter').value;
+  const type = document.getElementById('typeFilter').value;
+  const standard = document.getElementById('standardFilter').value;
+  const text = JSON.stringify(l).toLowerCase();
+  return (!q || text.includes(q)) && (set === 'all' || l.set === set) && (type === 'all' || l.type === type) && (standard === 'all' || l.standards.includes(standard));
+}
+function renderLessons() {
+  const list = document.getElementById('lessonList');
+  const filtered = lessons.filter(matches);
+  if (!filtered.some(l => l.n === selected) && filtered.length) selected = filtered[0].n;
+  list.innerHTML = filtered.map(l => `
+    <button class="card ${l.n === selected ? 'active' : ''}" onclick="selectLesson(${l.n})" aria-label="Open Lesson ${l.n}">
+      <div class="lesson-num">Lesson ${l.n} • ${l.days} day${l.days > 1 ? 's' : ''}</div>
+      <h3>${l.question}</h3>
+      <div>${l.phenomenon}</div>
+      <div class="meta"><span class="pill">${l.set}</span><span class="pill green">${l.type}</span><span class="pill orange">${l.pages}</span></div>
+    </button>
+  `).join('') || '<div class="notice">No lessons match your filters.</div>';
+  renderDetail();
+}
+function selectLesson(n) { selected = n; renderLessons(); }
+function listItems(arr) { return '<ul>' + arr.map(x => `<li>${x}</li>`).join('') + '</ul>'; }
+function linkItems(arr) { return '<div class="links">' + arr.map(([label,url]) => `<a href="${url}" target="_blank" rel="noopener">${label}</a>`).join('') + '</div>'; }
+function flowItems(arr) { return '<div class="timeline">' + arr.map((x,i) => `<div class="step"><b>${i+1}.</b> ${x}</div>`).join('') + '</div>'; }
+function prepChecklist(l) { return `<div class="checklist">
+  <label><input type="checkbox"> Open official OpenSciEd B.4 lesson materials</label>
+  <label><input type="checkbox"> Review teacher guide pages: ${l.pages}</label>
+  <label><input type="checkbox"> Preview slides</label>
+  <label><input type="checkbox"> Print/share student handouts</label>
+  <label><input type="checkbox"> Prepare materials: ${l.materials.slice(0,4).join(', ')}</label>
+  <label><input type="checkbox"> Review equity/accessibility supports and graphing/modeling needs</label>
+  <label><input type="checkbox"> Prepare exit ticket, assessment, or Progress Tracker update</label>
+</div>`; }
+function literacyItems(l) {
+  const map = {
+    1:['<b>Observation Literacy:</b> Identify evidence of urbanization and effects on local nonhuman populations.','<b>Reading:</b> Compare hawksbeard, junco, and rat case studies.','<b>Questioning:</b> Generate investigable questions for the DQB.'],
+    2:['<b>Investigation Literacy:</b> Compare class data with published scientific data.','<b>Data Literacy:</b> Interpret proportions of seed types.','<b>Explanation:</b> Link fragmentation to seed dispersal and reproductive success.'],
+    3:['<b>Evidence Evaluation:</b> Revise explanations when new genetic data are introduced.','<b>Ethical Reasoning:</b> Discuss investigations involving living things.','<b>Writing:</b> Explain poison as a selection pressure.'],
+    4:['<b>Data Literacy:</b> Interpret behavioral and CORT data.','<b>Modeling:</b> Explain how inherited behavior changes over generations.','<b>Vocabulary:</b> Use advantageous trait, selection pressure, and inherited trait accurately.'],
+    5:['<b>Synthesis Writing:</b> Combine multiple case studies into a natural selection model.','<b>Text Comparison:</b> Compare Lamarck and Darwin with student models.','<b>Argumentation:</b> Use evidence to support Darwinian natural selection.'],
+    6:['<b>Transfer Writing:</b> Apply the model to antibiotic-resistant bacteria.','<b>Cause/Effect:</b> Explain antibiotic use and resistance trends.','<b>Precision:</b> Distinguish population change from individual adaptation.'],
+    7:['<b>Model Critique:</b> Identify what the current natural selection model cannot explain.','<b>Problem Definition:</b> Frame questions about fragmentation, fitness, and city growth.','<b>Systems Thinking:</b> Connect urban development to population outcomes.'],
+    8:['<b>Mathematical Literacy:</b> Calculate/graph allele frequency changes.','<b>Model Literacy:</b> Use a fragmentation model to explain genetic diversity loss.','<b>Discussion:</b> Compare data across groups to build consensus.'],
+    9:['<b>Data Literacy:</b> Evaluate evidence for wildlife corridor effectiveness.','<b>Design Literacy:</b> Develop criteria for urban planning decisions.','<b>Argumentation:</b> Justify how corridors can maintain genetic diversity.'],
+    10:['<b>Decision Literacy:</b> Evaluate proposed urban designs using criteria and constraints.','<b>Reading:</b> Extract wildlife and human requirements from planning materials.','<b>Writing:</b> Defend design recommendations with trade-offs.'],
+    11:['<b>Transfer Writing:</b> Apply genetic diversity and natural selection ideas to banana crops.','<b>Evidence Integration:</b> Use clonal reproduction, genetic diversity, and selection pressure.','<b>Solution Evaluation:</b> Explain benefits and limits of resistant banana varieties.']
+  };
+  return '<ul>' + (map[l.n] || []).map(x => `<li>${x}</li>`).join('') + '</ul>';
+}
+function sentenceStems(l) {
+  const stems = {
+    default:['My claim is that ___ because ___.','The evidence I used was ___.','This shows a cause-and-effect relationship because ___.','I agree/disagree with ___ because ___.' ],
+    data:['I notice a pattern where ___.','The proportion/frequency of ___ changed from ___ to ___.','The data support the claim that ___ because ___.','A limitation of this data/model is ___.'],
+    model:['In my model, ___ represents ___.','The selection pressure is ___ because ___.','Individuals with ___ are more likely to ___ because ___.','Over generations, the population changes because ___.' ],
+    design:['One criterion for this solution is ___.','A constraint we must consider is ___.','This design supports biodiversity by ___.','A trade-off of this design is ___.' ]
+  };
+  let use = stems.default;
+  if ([2,3,4,8,9].includes(l.n)) use = stems.data;
+  if ([1,5,6,7,11].includes(l.n)) use = stems.model;
+  if ([9,10].includes(l.n)) use = stems.design;
+  return '<ul>' + use.map(s => `<li>${s}</li>`).join('') + '</ul>';
+}
+function renderDetail() {
+  const l = lessons.find(x => x.n === selected) || lessons[0];
+  document.getElementById('detail').innerHTML = `
+    <div class="detail-head">
+      <div class="lesson-num">Lesson ${l.n} • ${l.set} • ${l.type}</div>
+      <h2>${l.question}</h2>
+      <div class="meta"><span class="pill">${l.days} class day${l.days > 1 ? 's' : ''}</span><span class="pill orange">${l.pages}</span>${l.standards.map(s => `<span class="pill green">${s}</span>`).join('')}</div>
+    </div>
+    <div class="detail-body">
+      <div class="section sticky-resource"><h4>Official OpenSciEd Unit Resources</h4><div class="resource-buttons"><a class="resource-btn" href="${DRIVE_FOLDER}" target="_blank">Open Unit Google Drive</a></div><p style="margin:8px 0 0; font-size:13px; color:var(--muted);">Official folder for Unit B.4 slides, handouts, and teacher materials.</p></div>
+      <div class="section"><h4>Today at a Glance</h4><div class="timeline"><div class="step"><b>Objective:</b> ${l.question}</div><div class="step"><b>Focus Activity:</b> ${l.do.split('.')[0]}.</div><div class="step"><b>Success Criteria:</b> Students can explain: ${l.figure[0]}</div><div class="step"><b>Time:</b> ${l.days} class day${l.days>1?'s':''}</div></div></div>
+      <div class="section"><h4>Teacher Moves</h4><ul><li>Ask: “What is the selection pressure in this situation?”</li><li>Press: “Is this change happening to individuals or to the population over generations?”</li><li>Connect: “What evidence shows differential survival or reproduction?”</li><li>Clarify: “How does genetic variation affect resilience?”</li></ul></div>
+      <div class="section"><h4>Bell Ringer</h4><p><b>Prompt:</b> Before we begin, write one prediction or question connected to today’s lesson question:</p><div class="step">${l.question}</div><p style="margin-bottom:0;"><b>Share-out:</b> Compare with a partner and identify one piece of evidence that would help answer the question.</p></div>
+      <div class="section"><h4>Class Timer</h4><div class="timer-row"><div id="timerDisplay" class="timer-display">00:00</div><button class="timer-btn" data-timer="300">5 min</button><button class="timer-btn" data-timer="600">10 min</button><button class="timer-btn" data-timer="900">15 min</button><button class="timer-btn" data-timer="1200">20 min</button><button class="timer-btn secondary" data-timer-action="stop">Stop</button><button class="timer-btn secondary" data-timer-action="reset">Reset</button></div></div>
+      <div class="section"><h4>Random Talk Move</h4><div id="talkMove" class="talk-move">Click the button for a discussion prompt.</div><div style="margin-top:10px;"><button class="timer-btn" data-talk-move="new">New Talk Move</button></div></div>
+      <div class="notice"><b>Quick planning cue:</b> Keep language precise: populations evolve over generations; individual organisms do not intentionally evolve traits because they need them.</div>
+      <div class="section"><h4>Phenomenon / Design Problem</h4><p>${l.phenomenon}</p></div>
+      <details class="section" open><summary><h4>What students do</h4></summary><p>${l.do}</p></details>
+      <div class="twocol"><details class="section"><summary><h4>What students figure out</h4></summary>${listItems(l.figure)}</details><details class="section"><summary><h4>Materials & prep lookup</h4></summary>${listItems(l.materials)}</details></div>
+      <details class="section"><summary><h4>Lesson flow snapshot</h4></summary>${flowItems(l.flow)}</details>
+      <div class="twocol"><details class="section"><summary><h4>Equity / accessibility reminders</h4></summary>${listItems(l.equity)}</details><details class="section"><summary><h4>Disciplinary Literacy Strategies</h4></summary>${literacyItems(l)}<div style="margin-top:12px;"><h5 style="margin:0 0 6px; color:var(--teal-dark);">Student Sentence Stems</h5>${sentenceStems(l)}</div></details></div>
+      <div class="twocol"><div class="section"><h4>Daily Prep Checklist</h4>${prepChecklist(l)}</div><div class="section"><h4>OpenSciEd / External Links</h4>${linkItems(l.links)}</div></div>
+    </div>`;
+}
+function resetFilters(){ document.getElementById('search').value=''; document.getElementById('setFilter').value='all'; document.getElementById('typeFilter').value='all'; document.getElementById('standardFilter').value='all'; selected=1; renderLessons(); }
+renderLessons();
+let timerId=null, secondsLeft=0;
+function updateDisplay(){ const d=document.getElementById('timerDisplay'); if(!d) return; d.textContent=String(Math.floor(secondsLeft/60)).padStart(2,'0')+':'+String(secondsLeft%60).padStart(2,'0'); }
+function startClassTimer(seconds){ clearInterval(timerId); secondsLeft=seconds; updateDisplay(); timerId=setInterval(()=>{ secondsLeft=Math.max(0,secondsLeft-1); updateDisplay(); if(secondsLeft===0){ clearInterval(timerId); timerId=null;} },1000); }
+function stopClassTimer(){ clearInterval(timerId); timerId=null; }
+function resetClassTimer(){ clearInterval(timerId); timerId=null; secondsLeft=0; updateDisplay(); }
+const talkMoves=['Can you say more about that?','What evidence supports your idea?','Who can add on to that thinking?','Do you agree or disagree? What is your evidence?','What is the selection pressure?','Is this individual change or population change?','How does this connect to natural selection?','What pattern do you notice?','What might be another explanation?','What data would help us decide?'];
+function showTalkMove(){ const box=document.getElementById('talkMove'); if(!box) return; box.textContent=talkMoves[Math.floor(Math.random()*talkMoves.length)]; }
+document.addEventListener('click', function(event){ const timerButton=event.target.closest('[data-timer]'); if(timerButton){ event.preventDefault(); startClassTimer(Number(timerButton.getAttribute('data-timer'))); return;} const actionButton=event.target.closest('[data-timer-action]'); if(actionButton){ event.preventDefault(); const a=actionButton.getAttribute('data-timer-action'); if(a==='stop') stopClassTimer(); if(a==='reset') resetClassTimer(); return;} const talkButton=event.target.closest('[data-talk-move]'); if(talkButton){ event.preventDefault(); showTalkMove(); }});
+</script>
+</body>
+</html>
